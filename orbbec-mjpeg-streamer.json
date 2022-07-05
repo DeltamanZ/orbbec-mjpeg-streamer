@@ -1,6 +1,6 @@
 {
   "host": "0.0.0.0",
-  "port": 8080,
+  "port": 8081,
   "camera_port_index": 0,
   "video_params": {
       "width": 1280,
@@ -28,7 +28,7 @@
           },
           "file": {
               "class": "logging.handlers.RotatingFileHandler",
-              "filename": "/var/log/orbbec-mjpeg-streamer/orbbec-mjpeg-streamer.log",
+              "filename": "/var/log/cam1/orbbec-mjpeg-streamer.log",
               "maxBytes": 1048576,
               "backupCount": 4,
               "formatter": "default",
@@ -36,7 +36,7 @@
           },
           "access_log": {
               "class": "logging.handlers.RotatingFileHandler",
-              "filename": "/var/log/orbbec-mjpeg-streamer/access.log",
+              "filename": "/var/log/cam1/access.log",
               "maxBytes": 1048576,
               "backupCount": 4,
               "formatter": "access_log",
