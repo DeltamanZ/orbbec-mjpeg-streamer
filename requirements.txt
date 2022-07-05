@@ -1,0 +1,6 @@
+aiohttp~=3.6.3
+aiohttp-cors
+opencv-python==4.5.2.54
+pillow==7.0.0
+
+m7-aiohttp
