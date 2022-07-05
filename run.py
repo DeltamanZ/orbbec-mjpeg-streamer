@@ -23,7 +23,7 @@ def get_config_files():
         '--config',
         help='configuration file name',
         type=str,
-        default='/etc/orbbec-mjpeg-streamer/orbbec-mjpeg-streamer.json')  # TODO: в проекте есть файл orbbec-mjpeg-streamer.json - его надо положить в папку, указанную тут. При необходимости каталог можно изменить
+        default='/etc/cam1/orbbec-mjpeg-streamer/orbbec-mjpeg-streamer.json') 
     args, _ = parser.parse_known_args()
 
     if not args.config:
