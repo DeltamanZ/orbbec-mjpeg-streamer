@@ -9,9 +9,8 @@ logger = logging.getLogger('orbbec-mjpeg-streamer')
 
 
 class MjpegHandlerService(CorsViewMixin):
-    def __init__(self, app) -> None:
+    def __init__(self) -> None:
         super().__init__()
-        self.app = app
 
     @logged(logger)
     async def mjpeg_handler_rgb(self, request):
@@ -19,4 +18,4 @@ class MjpegHandlerService(CorsViewMixin):
         response.content_type = 'multipart/x-mixed-replace; boundary=frame'
         await response.prepare(request)
         while True:
-            await response.write(self.app["frame"])
+            await response.write(request.app["frame"])

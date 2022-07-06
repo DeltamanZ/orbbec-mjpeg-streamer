@@ -88,7 +88,7 @@ def create_app(loop: AbstractEventLoop = None, config: dict = None) -> web.Appli
     scanner = Scanner(config['video_params'])  # инициализируем класс, в котором реализовано общение с камерой
 
     app['scanner'] = scanner
-    app['camera_service'] = MjpegHandlerService(app) #????
+    app['camera_service'] = MjpegHandlerService()
 
     cors.add(app.router.add_route('GET', '/', app['camera_service'].mjpeg_handler_rgb))  # endpoint, на котором мы можем посмотреть mjpeg-поток. Пример http://192.168.1.245:8080/
 
