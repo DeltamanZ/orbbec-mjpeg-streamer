@@ -19,3 +19,13 @@ class MjpegHandlerService(CorsViewMixin):
         await response.prepare(request)
         while True:
             await response.write(request.app["frame"])
+
+    @logged(logger)
+    async def mjpeg_handler_depth(self, request):
+        response = web.StreamResponse()
+        response.content_type = 'multipart/x-mixed-replace; boundary=frame'
+        await response.prepare(request)
+        while True:
+            await response.write(request.app["depth"])
+
+    
