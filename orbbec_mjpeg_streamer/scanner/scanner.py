@@ -38,6 +38,8 @@ class Scanner:
                 print("Cant grab frame")
             result, frame = self._camera.retrieve(cv2.CAP_OPENNI_GRAY_IMAGE)
             result, depth = self._depth_sensor.retrieve(cv2.CAP_OPENNI_DEPTH_MAP)
+            app["min_distance"] = str(depth.max())
+            depth = np.uint8(depth)
             if result:
                 depth = cv2.imencode('.jpeg', depth)[1].tobytes()        
                 app["depth"] = b'--frame\r\nContent-Type: image/jpeg\r\n\r\n' + depth + b'\r\n'
