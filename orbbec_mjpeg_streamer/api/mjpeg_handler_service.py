@@ -30,16 +30,12 @@ class MjpegHandlerService(CorsViewMixin):
         while True:
             await response.write(request.app["depth"])
 
-    @logged(logger)
+    @logged(logger):
     async def mjpeg_handler_min_distance(self, request):
-        resp = web.StreamResponse(status=200, 
-                              reason='OK', 
-                              headers={'Content-Type': 'text/html'})
-        await resp.prepare(request)
-        await resp.write(f"<html><body id=\"test\">Test</body></html>".encode("cp1251"))
+        response = web.StreamResponse()
+        response.content_type = 'multipart/x-mixed-replace; boundary=border'
+        await response.prepare(request)
         while True:
-            dist = request.app["min_distance"]
-            await resp.write(f"<script>if (test === undefined) var test = document.getElementById(\"test\"); test.innerText = \"{dist}\" </script>".encode("utf-8"))
-            await resp.drain()
+            distance = request.app["min_distance"]
+            await response.write(f"--border\r\nContent-Type: text/plain\r\n\r\n{distance}\r\n".encode("utf-8"))
             await asyncio.sleep(1)
-        # return web.Response(text=request.app["min_distance"])  
