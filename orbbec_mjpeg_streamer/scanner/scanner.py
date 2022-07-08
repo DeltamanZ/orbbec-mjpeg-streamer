@@ -1,8 +1,8 @@
 import asyncio
 import logging
 from operator import truediv
+from time import time
 import cv2
-import numpy as np
 
 
 logger = logging.getLogger('orbbec-mjpeg-streamer')
@@ -11,13 +11,11 @@ logger = logging.getLogger('orbbec-mjpeg-streamer')
 class Scanner:
     def __init__(self, video_params: dict):
         self._video_params = video_params
+        self._faceCascade = cv2.CascadeClassifier('haarcascade_frontalface_alt.xml')
+        self._checked = 0
 
     async def init_device(self):
-        self._depth_sensor = cv2.VideoCapture(cv2.CAP_OPENNI2_ASTRA)
-        self._depth_sensor.set(3, self._video_params["width"])
-        self._depth_sensor.set(4, self._video_params["height"])
-
-        self._camera = cv2.VideoCapture(1)        
+        self._camera = cv2.VideoCapture(0)        
         self._camera.set(3, self._video_params["width"])
         self._camera.set(4, self._video_params["height"])
         self._camera.set(5, self._video_params["fps"])
@@ -29,20 +27,24 @@ class Scanner:
         self._camera.set(20, self._video_params["sharpness"])
         self._camera.set(32, self._video_params["backlight_compensation"])
         self._camera.set(21, self._video_params["exposure_auto"])        
-        
 
+    async def _find_faces(self, frame):
+        frame_gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
+        frame_gray = cv2.equalizeHist(frame_gray)
+        faces = self._faceCascade.detectMultiScale(frame_gray)
+        for (x, y, w, h) in faces:
+            frame = cv2.rectangle(frame, (x, y), (x+w, y+h), (0, 255, 0), thickness=2)
+        if len(faces) > 0:
+            cv2.imwrite("face.jpg", frame)
+        return frame
 
     async def image_grabber(self, app):
         while True:
-            if not self._camera.grab() or not self._depth_sensor.grab():
-                print("Cant grab frame")
-            result, frame = self._camera.retrieve(cv2.CAP_OPENNI_GRAY_IMAGE)
-            result, depth = self._depth_sensor.retrieve(cv2.CAP_OPENNI_DEPTH_MAP)
-            app["min_distance"] = str(depth.max())
-            depth = np.uint8(depth)
+            result, frame = self._camera.read()
             if result:
-                depth = cv2.imencode('.jpeg', depth)[1].tobytes()        
-                app["depth"] = b'--frame\r\nContent-Type: image/jpeg\r\n\r\n' + depth + b'\r\n'
+                if time()-self._checked > 0.5:
+                    frame = await self._find_faces(frame)
+                    self._checked = time()
                 frame = cv2.imencode('.jpeg', frame)[1].tobytes()        
                 app["frame"] = b'--frame\r\nContent-Type: image/jpeg\r\n\r\n' + frame + b'\r\n'
             await asyncio.sleep(1 / self._video_params["fps"])
