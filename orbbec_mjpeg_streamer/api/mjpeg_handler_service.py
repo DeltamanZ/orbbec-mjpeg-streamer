@@ -30,7 +30,7 @@ class MjpegHandlerService(CorsViewMixin):
         while True:
             await response.write(request.app["depth"])
 
-    @logged(logger):
+    @logged(logger)
     async def mjpeg_handler_min_distance(self, request):
         response = web.StreamResponse()
         response.content_type = 'multipart/x-mixed-replace; boundary=border'
