@@ -91,8 +91,8 @@ def create_app(loop: AbstractEventLoop = None, config: dict = None) -> web.Appli
     app['camera_service'] = MjpegHandlerService()
 
     cors.add(app.router.add_route('GET', '/', app['camera_service'].mjpeg_handler_rgb))  # endpoint, на котором мы можем посмотреть mjpeg-поток. Пример http://192.168.1.245:8080/
-    cors.add(app.router.add_route("GET", "/depth", app["camera_service"].mjpeg_handler_depth)) # endpoint for depth sensor stream
-    cors.add(app.router.add_route("GET", "/distance", app["camera_service"].mjpeg_handler_min_distance)) # endpoint for depth sensor stream
+    # cors.add(app.router.add_route("GET", "/depth", app["camera_service"].mjpeg_handler_depth)) # endpoint for depth sensor stream
+    # cors.add(app.router.add_route("GET", "/distance", app["camera_service"].mjpeg_handler_min_distance)) # endpoint for depth sensor stream
 
     app.on_startup.append(on_app_start)
     app.on_shutdown.append(on_app_stop)
