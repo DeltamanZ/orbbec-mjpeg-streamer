@@ -28,22 +28,26 @@ class Scanner:
         self._camera.set(32, self._video_params["backlight_compensation"])
         self._camera.set(21, self._video_params["exposure_auto"])        
 
-    async def _find_faces(self, frame):
+    async def _find_faces(self, frame, app):
+        app["face_found"] = False
         frame_gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
         frame_gray = cv2.equalizeHist(frame_gray)
         faces = self._faceCascade.detectMultiScale(frame_gray)
         for (x, y, w, h) in faces:
             frame = cv2.rectangle(frame, (x, y), (x+w, y+h), (0, 255, 0), thickness=2)
         if len(faces) > 0:
+            app["face_found"] = True
+            app["last_frame"] = cv2.imencode('.jpeg', frame)[1].tobytes()
             cv2.imwrite("face.jpg", frame)
         return frame
 
     async def image_grabber(self, app):
+        app["face_found"] = False
         while True:
             result, frame = self._camera.read()
             if result:
                 if time()-self._checked > 0.5:
-                    frame = await self._find_faces(frame)
+                    frame = await self._find_faces(frame, app)
                     self._checked = time()
                 frame = cv2.imencode('.jpeg', frame)[1].tobytes()        
                 app["frame"] = b'--frame\r\nContent-Type: image/jpeg\r\n\r\n' + frame + b'\r\n'
